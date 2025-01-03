@@ -1,3 +1,4 @@
+version: '3.8'
 services:
   database:
     image: postgres
@@ -20,6 +21,7 @@ services:
     restart: always
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+
     depends_on:
       - database
     ports:
