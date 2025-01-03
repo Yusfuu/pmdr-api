@@ -1,0 +1,70 @@
+type Room {
+  id: ID!
+  name: String!
+  host: User!
+  participants: [User]!
+}
+
+type SignalData {
+  from: String!
+  to: String!
+  type: String!
+  payload: String!
+}
+
+input SignalDataInput {
+  from: String!
+  to: String!
+  type: String!
+  payload: String!
+}
+
+type RoomUpdatePayload {
+  room: Room!
+}
+
+type RoomActivity {
+  roomId: ID!
+  user: User!
+  action: RoomAction!
+  timestamp: String!
+}
+
+enum RoomAction {
+  JOINED
+  LEFT
+}
+
+input CreateRoomInput {
+  name: String!
+  hostId: ID!
+}
+
+input JoinRoomInput {
+  roomId: String!
+  userId: ID!
+}
+
+input LeaveRoomInput {
+  roomId: String!
+  userId: ID!
+}
+
+type Query {
+  rooms: [Room]!
+  room(id: String!): Room
+  hostedRoomsByUserId(userId: String!): [Room]!
+}
+
+type Mutation {
+  createRoom(createRoomInput: CreateRoomInput!): Room!
+  joinRoom(joinRoomInput: JoinRoomInput!): Room!
+  leaveRoom(leaveRoomInput: LeaveRoomInput!): Room!
+  removeRoom(id: String!): Room
+  sendSignal(roomId: ID!, signal: SignalDataInput!): Boolean!
+}
+
+type Subscription {
+  roomUpdated(roomId: String!): RoomUpdatePayload!
+  signalReceived(roomId: ID!): SignalData!
+}
