@@ -1,4 +1,4 @@
-FROM node:20
+FROM node:latest
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
@@ -12,6 +12,8 @@ RUN npm install
 # Copy the rest of the application files
 COPY . .
 
+RUN npx prisma generate
+
 # Build the NestJS application
 RUN npm run build
 
@@ -19,4 +21,4 @@ RUN npm run build
 EXPOSE 1337
 
 # Command to run the application
-CMD ["node", "dist/main"]
+CMD ["npm", "run", "start:prod"]
