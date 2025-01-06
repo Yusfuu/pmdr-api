@@ -12,7 +12,11 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Build the Docker image
-        run: sudo docker compose up -d
+      - name: Build the Docker image (no cache)
+        run: sudo docker-compose build --no-cache
+      - name: Stop existing containers
+        run: sudo docker-compose down
+      - name: Start the Docker containers
+        run: sudo docker-compose up -d
       - name: Run Prisma Migrations
         run: sudo docker exec camp-mingle-app npx prisma migrate deploy
