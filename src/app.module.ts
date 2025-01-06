@@ -6,6 +6,7 @@ import { join } from 'path';
 import { UsersModule } from './users/users.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { AuthModule } from './auth/auth.module';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 
 @Module({
   imports: [
@@ -21,6 +22,8 @@ import { AuthModule } from './auth/auth.module';
         'graphql-ws': true,
       },
       context: ({ req, res }) => ({ req, res }),
+      plugins: [ApolloServerPluginLandingPageLocalDefault()],
+      playground: false,
     }),
     UsersModule,
     RoomsModule,
