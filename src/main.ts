@@ -10,7 +10,10 @@ async function bootstrap() {
   //   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
   //   allowedHeaders: 'Content-Type, Authorization',
   // });
-  app.enableCors();
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,POST,PUT,DELETE,OPTIONS',
+  });
   app.use(cookieParser());
 
   await app.listen(process.env.PORT ?? 3000);
