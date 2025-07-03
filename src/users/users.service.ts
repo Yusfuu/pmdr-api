@@ -10,9 +10,10 @@ export class UsersService {
   async create(createUserInput: CreateUserInput): Promise<User> {
     const { username, avatar = null, password } = createUserInput;
 
-    return this.prisma.user.create({
-      data: { username, avatar, password },
-    });
+    return { username, avatar, password: '', id: '' };
+    // return this.prisma.user.create({
+    //   data: { username, avatar, password },
+    // });
   }
 
   async findOne(id: string): Promise<User | null> {
@@ -30,6 +31,14 @@ export class UsersService {
   async remove(id: string): Promise<User> {
     return this.prisma.user.delete({
       where: { id },
+    });
+  }
+
+  async searchUsers(keyword: string) {
+    return this.prisma.user.findMany({
+      where: {
+        OR: [{ username: { contains: keyword, mode: 'insensitive' } }],
+      },
     });
   }
 }

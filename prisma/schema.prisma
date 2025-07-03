@@ -8,70 +8,31 @@ datasource db {
 }
 
 model User {
-  id                 String            @id @default(uuid())
-  username           String            @unique
-  avatar             String?
-  status             UserStatus        @default(OFFLINE)
-  hostedRooms        Room[]            @relation("Host")
-  participantInRooms RoomParticipant[]
-  roomActivities     RoomActivity[]
-  RefreshToken       RefreshToken[]
-  password           String
+  id       String  @id @default(uuid())
+  username String  @unique
+  avatar   String?
+  password String
+  Event    Event[]
 }
 
-model RefreshToken {
-  id        String   @id @default(uuid())
-  token     String   @unique
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-}
+model Event {
+  id            String   @id @default(cuid())
+  title         String
+  description   String?
+  coverImageUrl String?
+  scheduledAt   DateTime
+  startNow      Boolean  @default(false)
+  pushReminder  Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  hostId        String
+  host          User     @relation(fields: [hostId], references: [id])
 
-model Room {
-  id              String            @id @default(uuid())
-  name            String            @unique
-  hostId          String
-  host            User              @relation("Host", fields: [hostId], references: [id])
-  participants    RoomParticipant[]
-  activities      RoomActivity[]
-  visibility      RoomVisibility    @default(PUBLIC)
-  maxParticipants Int?
-}
-
-model RoomParticipant {
-  id     String @id @default(uuid())
-  userId String
-  roomId String
-  user   User   @relation(fields: [userId], references: [id])
-  room   Room   @relation(fields: [roomId], references: [id])
-
-  @@unique([userId, roomId]) // Ensure each user can only join a room once
-}
-
-model RoomActivity {
-  id        String     @id @default(uuid())
-  roomId    String
-  userId    String
-  action    RoomAction
-  timestamp DateTime   @default(now())
-
-  user User @relation(fields: [userId], references: [id])
-  room Room @relation(fields: [roomId], references: [id])
-}
-
-enum RoomVisibility {
-  PUBLIC
-  PRIVATE
+  @@index([scheduledAt])
 }
 
 enum UserStatus {
   ONLINE
   OFFLINE
   AWAY
-}
-
-enum RoomAction {
-  JOINED
-  LEFT
 }

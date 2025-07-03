@@ -3,6 +3,7 @@ type User {
   username: String!
   avatar: String
   status: UserStatus!
+  events: [Event!]!
 }
 
 input CreateUserInput {
@@ -18,8 +19,8 @@ enum UserStatus {
 }
 
 type Query {
-  users: [User]!
   user(id: Int!): User
+  users(keyword: String!): [User]!
 }
 
 type Mutation {

@@ -7,7 +7,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install the application dependencies
-RUN npm install
+RUN yarn install
 
 # Copy the rest of the application files
 COPY . .
@@ -15,10 +15,10 @@ COPY . .
 RUN npx prisma generate
 
 # Build the NestJS application
-RUN npm run build
+RUN yarn build
 
 # Expose the application port
 EXPOSE 1337
 
 # Command to run the application
-CMD ["npm", "run", "start:prod"]
+CMD ["yarn", "start:prod"]

@@ -1,0 +1,30 @@
+type Event {
+  id: ID!
+  title: String!
+  description: String
+  coverImageUrl: String
+  scheduledAt: String!
+  startNow: Boolean!
+  pushReminder: Boolean!
+  createdAt: String!
+  updatedAt: String!
+  host: User!
+}
+
+input CreateEventInput {
+  title: String!
+  description: String
+  scheduledAt: String!
+  startNow: Boolean = false
+  pushReminder: Boolean = true
+}
+
+type Query {
+  event(id: String!): Event
+  events: [Event!]!
+}
+
+type Mutation {
+  createEvent(data: CreateEventInput!): Event!
+  removeEvent(id: String!): Event
+}

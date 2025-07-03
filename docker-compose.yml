@@ -1,7 +1,7 @@
 services:
   database:
     image: postgres
-    container_name: camp-mingle-db
+    container_name: pmdr-db
     restart: always
     env_file:
       - .env
@@ -18,7 +18,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: camp-mingle-app
+    container_name: pmdr-app
     restart: always
     env_file:
       - .env

@@ -1,8 +1,6 @@
 import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { CreateUserInput } from 'src/graphql';
-import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from 'src/auth/auth.guard';
 
 @Resolver('User')
 export class UsersResolver {
@@ -18,9 +16,13 @@ export class UsersResolver {
     return this.usersService.findOne(id);
   }
 
-  @UseGuards(AuthGuard)
   @Mutation('removeUser')
   remove(@Args('id') id: string) {
     return this.usersService.remove(id);
+  }
+
+  @Query('users')
+  users(@Args('keyword') keyword: string) {
+    return this.usersService.searchUsers(keyword);
   }
 }
