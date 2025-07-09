@@ -17,4 +17,4 @@ jobs:
       - name: Build and start the Docker containers
         run: sudo docker compose up -d
       - name: Run Prisma Migrations
-        run: sudo docker exec camp-mingle-app npx prisma migrate deploy
+        run: sudo docker exec camp-mingle-app npx prisma migrate reset --force
