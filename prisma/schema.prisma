@@ -8,70 +8,7 @@ datasource db {
 }
 
 model User {
-  id                 String            @id @default(uuid())
-  username           String            @unique
-  avatar             String?
-  status             UserStatus        @default(OFFLINE)
-  hostedRooms        Room[]            @relation("Host")
-  participantInRooms RoomParticipant[]
-  roomActivities     RoomActivity[]
-  RefreshToken       RefreshToken[]
-  password           String
-}
-
-model RefreshToken {
-  id        String   @id @default(uuid())
-  token     String   @unique
-  userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  expiresAt DateTime
-  createdAt DateTime @default(now())
-}
-
-model Room {
-  id              String            @id @default(uuid())
-  name            String            @unique
-  hostId          String
-  host            User              @relation("Host", fields: [hostId], references: [id])
-  participants    RoomParticipant[]
-  activities      RoomActivity[]
-  visibility      RoomVisibility    @default(PUBLIC)
-  maxParticipants Int?
-}
-
-model RoomParticipant {
-  id     String @id @default(uuid())
-  userId String
-  roomId String
-  user   User   @relation(fields: [userId], references: [id])
-  room   Room   @relation(fields: [roomId], references: [id])
-
-  @@unique([userId, roomId]) // Ensure each user can only join a room once
-}
-
-model RoomActivity {
-  id        String     @id @default(uuid())
-  roomId    String
-  userId    String
-  action    RoomAction
-  timestamp DateTime   @default(now())
-
-  user User @relation(fields: [userId], references: [id])
-  room Room @relation(fields: [roomId], references: [id])
-}
-
-enum RoomVisibility {
-  PUBLIC
-  PRIVATE
-}
-
-enum UserStatus {
-  ONLINE
-  OFFLINE
-  AWAY
-}
-
-enum RoomAction {
-  JOINED
-  LEFT
+  id       String @id @default(uuid())
+  username String @unique
+  email    String @unique
 }
