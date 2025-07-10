@@ -10,7 +10,7 @@ services:
       - postgres
     volumes:
       - .:/app
-    command: bash -c "npx prisma migrate deploy && npm run seed && npm run start:prod"
+    command: bash -c "npx prisma migrate deploy && yarn seed && yarn start:prod"
 
   postgres:
     image: postgres
