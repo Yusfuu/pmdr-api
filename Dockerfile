@@ -1,4 +1,6 @@
-FROM node:latest
+FROM node:lts-alpine
+
+RUN corepack enable && corepack prepare yarn@stable --activate
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
