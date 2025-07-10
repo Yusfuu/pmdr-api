@@ -8,6 +8,7 @@ export class PrismaService
 {
   async onModuleInit() {
     await this.$connect();
+    console.log('[PrismaService] ✅ Database connected');
   }
 
   async onModuleDestroy() {

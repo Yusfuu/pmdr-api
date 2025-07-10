@@ -1,29 +1,29 @@
 services:
-  database:
+  app:
+    build: .
+    container_name: bstni-api
+    ports:
+      - '1337:1337'
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/mydb
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+    command: bash -c "npx prisma migrate deploy && npm run seed && npm run start:prod"
+
+  postgres:
     image: postgres
-    container_name: camp-mingle-db
+    container_name: postgres-db
     restart: always
     environment:
-      POSTGRES_USER: myuser
-      POSTGRES_PASSWORD: mypassword
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: mydb
     ports:
       - '5432:5432'
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: camp-mingle-app
-    restart: always
-    environment:
-      DATABASE_URL: postgresql://myuser:mypassword@localhost:5432/mydb
-    depends_on:
-      - database
-    ports:
-      - '1337:1337'
+      - postgres-data:/var/lib/postgresql/data
 
 volumes:
-  postgres_data:
+  postgres-data:
