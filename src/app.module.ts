@@ -23,6 +23,7 @@ import { join } from 'path';
       definitions: {
         path: join(process.cwd(), 'src/graphql.ts'),
       },
+      path: '/gql',
     }),
   ],
   controllers: [AppController],
