@@ -1,6 +1,4 @@
-FROM node:lts-alpine
-
-RUN corepack enable && corepack prepare yarn@stable --activate
+FROM node:lts
 
 # Set the working directory inside the container
 WORKDIR /usr/src/app
@@ -14,7 +12,7 @@ RUN yarn install
 # Copy the rest of the application files
 COPY . .
 
-RUN yarn prisma generate
+RUN npx prisma generate
 
 # Build the NestJS application
 RUN yarn build
