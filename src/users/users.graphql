@@ -16,3 +16,7 @@ type Query {
 type Mutation {
   createUser(input: CreateUserInput!): User!
 }
+
+type Subscription {
+  userCreated: User!
+}

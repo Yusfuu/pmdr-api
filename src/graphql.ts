@@ -9,22 +9,26 @@
 /* eslint-disable */
 
 export interface CreateUserInput {
-    email: string;
     name: string;
+    email: string;
 }
 
-export interface IMutation {
-    createUser(input: CreateUserInput): User | Promise<User>;
+export interface User {
+    id: string;
+    name: string;
+    email: string;
 }
 
 export interface IQuery {
     users(): User[] | Promise<User[]>;
 }
 
-export interface User {
-    email: string;
-    id: string;
-    name: string;
+export interface IMutation {
+    createUser(input: CreateUserInput): User | Promise<User>;
+}
+
+export interface ISubscription {
+    userCreated(): User | Promise<User>;
 }
 
 type Nullable<T> = T | null;
