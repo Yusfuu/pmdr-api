@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserInput } from 'src/graphql';
+import { CreateUserInput } from 'src/graphql/graphql';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()

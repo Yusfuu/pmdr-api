@@ -7,12 +7,9 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { UsersResolver } from './users/users.resolver';
 import { UsersService } from './users/users.service';
-import { ThrottlerModule } from '@nestjs/throttler';
-import { GlobalGuards } from './constants/global-guards';
 
 @Module({
   imports: [
-    ThrottlerModule.forRoot([{ ttl: 30, limit: 25 }]),
     PrismaModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
@@ -27,6 +24,6 @@ import { GlobalGuards } from './constants/global-guards';
     }),
   ],
   controllers: [AppController],
-  providers: [...GlobalGuards, AppService, UsersResolver, UsersService],
+  providers: [AppService, UsersResolver, UsersService],
 })
 export class AppModule {}

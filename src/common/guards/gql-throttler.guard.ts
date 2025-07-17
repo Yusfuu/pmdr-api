@@ -9,7 +9,6 @@ export class GqlThrottlerGuard extends ThrottlerGuard {
     const ctx = gqlCtx.getContext();
 
     console.log('Throttling request from:', ctx.req.ip);
-
     return { req: ctx.req, res: ctx.res };
   }
 }
