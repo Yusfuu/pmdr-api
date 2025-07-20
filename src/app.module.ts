@@ -5,12 +5,16 @@ import { PrismaModule } from './prisma/prisma.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import { UsersResolver } from './users/users.resolver';
-import { UsersService } from './users/users.service';
+import { UsersModule } from './users/users.module';
+import { AuthModule } from './auth/auth.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
     PrismaModule,
+    UsersModule,
+    AuthModule,
+    RedisModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       subscriptions: { 'graphql-ws': true },
@@ -24,6 +28,6 @@ import { UsersService } from './users/users.service';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService, UsersResolver, UsersService],
+  providers: [AppService],
 })
 export class AppModule {}

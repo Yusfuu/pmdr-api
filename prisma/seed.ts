@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
+import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
@@ -7,6 +8,8 @@ async function main() {
   const counter = 10;
 
   console.log('🌱 Seeding database...');
+
+  const hashedPassword = await bcrypt.hash('secret', 10);
 
   // Optional: clear existing
   await prisma.user.deleteMany();
@@ -17,6 +20,7 @@ async function main() {
       data: {
         email: faker.internet.email(),
         name: faker.person.fullName(),
+        password: hashedPassword,
       },
     });
   }

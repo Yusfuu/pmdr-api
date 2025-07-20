@@ -2,6 +2,7 @@ import { Args, Mutation, Query, Resolver, Subscription } from '@nestjs/graphql';
 import { UsersService } from './users.service';
 import { CreateUserInput, User } from 'src/graphql/graphql';
 import { pubSub } from 'src/common/constants/pubsub';
+import * as bcrypt from 'bcrypt';
 
 @Resolver('User')
 export class UsersResolver {
@@ -14,7 +15,9 @@ export class UsersResolver {
 
   @Mutation('createUser')
   async createUser(@Args('input') input: CreateUserInput) {
-    const user = await this.userService.create(input);
+    const password = await bcrypt.hash(input.password, 10);
+
+    const user = await this.userService.create({ ...input, password });
     await pubSub.publish('userCreated', { userCreated: user });
     return user;
   }

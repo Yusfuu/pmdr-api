@@ -11,20 +11,29 @@
 export interface CreateUserInput {
     name: string;
     email: string;
+    password: string;
+}
+
+export interface Tokens {
+    access_token?: Nullable<string>;
+    refresh_token?: Nullable<string>;
+}
+
+export interface IMutation {
+    signIn(email: string, password: string): Tokens | Promise<Tokens>;
+    refreshToken(refresh_token: string): Tokens | Promise<Tokens>;
+    createUser(input: CreateUserInput): User | Promise<User>;
+}
+
+export interface IQuery {
+    me(): User | Promise<User>;
+    users(): User[] | Promise<User[]>;
 }
 
 export interface User {
     id: string;
     name: string;
     email: string;
-}
-
-export interface IQuery {
-    users(): User[] | Promise<User[]>;
-}
-
-export interface IMutation {
-    createUser(input: CreateUserInput): User | Promise<User>;
 }
 
 export interface ISubscription {

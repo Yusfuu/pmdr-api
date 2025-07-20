@@ -1,0 +1,13 @@
+type Tokens {
+  access_token: String
+  refresh_token: String
+}
+
+type Mutation {
+  signIn(email: String!, password: String!): Tokens!
+  refreshToken(refresh_token: String!): Tokens!
+}
+
+type Query {
+  me: User!
+}
