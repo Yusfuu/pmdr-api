@@ -13,7 +13,7 @@ services:
       - redis
     volumes:
       - .:/app
-    command: bash -c "npx prisma migrate deploy && yarn seed && yarn start:prod"
+    command: bash -c "npx prisma migrate reset --force && yarn seed && yarn start:prod"
 
   postgres:
     image: postgres
