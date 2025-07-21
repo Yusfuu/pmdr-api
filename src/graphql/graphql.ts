@@ -21,6 +21,7 @@ export interface Tokens {
 
 export interface IMutation {
     signIn(email: string, password: string): Tokens | Promise<Tokens>;
+    signOut(refresh_token?: Nullable<string>): boolean | Promise<boolean>;
     refreshToken(refresh_token: string): Tokens | Promise<Tokens>;
     createUser(input: CreateUserInput): User | Promise<User>;
 }

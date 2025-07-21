@@ -28,9 +28,9 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    const access_token = await this.access_token(user);
+    const access_token = await this.access_token({ id: user.id });
 
-    const refresh_token = await this.refresh_token(user);
+    const refresh_token = await this.refresh_token({ id: user.id });
 
     await this.redisClient.set(
       `refresh_token:${user.id}`,
@@ -63,15 +63,15 @@ export class AuthService {
       `refresh_token:${payload.id}`,
     );
 
-    // if (!storedToken || storedToken !== refreshToken) {
-    //   throw new UnauthorizedException('Invalid or expired refresh token');
-    // }
+    if (!storedToken || storedToken !== refreshToken) {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
 
     const user = await this.usersService.findById(payload.id);
     if (!user) throw new UnauthorizedException();
 
-    const access_token = await this.access_token(user);
-    const refresh_token = await this.refresh_token(user);
+    const access_token = await this.access_token({ id: user.id });
+    const refresh_token = await this.refresh_token({ id: user.id });
 
     await this.redisClient.set(
       `refresh_token:${user.id}`,
@@ -86,14 +86,14 @@ export class AuthService {
   async access_token(payload) {
     return this.jwtService.signAsync(payload, {
       secret: process.env.JWT_SECRET,
-      expiresIn: '10s',
+      expiresIn: `${process.env.JWT_ACCESS_EXPIRATION}s`,
     });
   }
 
   async refresh_token(payload) {
     return this.jwtService.signAsync(payload, {
       secret: process.env.JWT_SECRET,
-      expiresIn: process.env.JWT_REFRESH_EXPIRATION,
+      expiresIn: `${process.env.JWT_REFRESH_EXPIRATION}s`,
     });
   }
 

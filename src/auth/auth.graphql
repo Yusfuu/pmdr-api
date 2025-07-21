@@ -5,7 +5,7 @@ type Tokens {
 
 type Mutation {
   signIn(email: String!, password: String!): Tokens!
-  signOut(refresh_token: String!): Boolean!
+  signOut(refresh_token: String): Boolean!
   refreshToken(refresh_token: String!): Tokens!
 }
 

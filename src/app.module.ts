@@ -8,6 +8,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { RedisModule } from './redis/redis.module';
+import { JobsModule } from './jobs/jobs.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { RedisModule } from './redis/redis.module';
     UsersModule,
     AuthModule,
     RedisModule,
+    JobsModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       subscriptions: { 'graphql-ws': true },
