@@ -37,16 +37,6 @@ services:
     volumes:
       - redis-data:/data
 
-  redisinsight:
-    image: redislabs/redisinsight:latest
-    container_name: redisinsight
-    restart: always
-    ports:
-      - '1338:8001'
-    depends_on:
-      - redis
-    environment:
-      - REDIS_HOSTS=redis:6379
 volumes:
   postgres-data:
   redis-data:

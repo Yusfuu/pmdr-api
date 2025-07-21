@@ -3,6 +3,7 @@ import { Test } from '@nestjs/testing';
 import * as request from 'supertest';
 import Redis from 'ioredis';
 import { AppModule } from 'src/app.module';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 describe('Auth Flow (e2e)', () => {
   let app: INestApplication;
@@ -31,6 +32,8 @@ describe('Auth Flow (e2e)', () => {
 
   afterAll(async () => {
     await redis.quit();
+    await app.get(PrismaService).onModuleDestroy(); // optional
+
     await app.close();
   });
 

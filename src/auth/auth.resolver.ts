@@ -21,6 +21,11 @@ export class AuthResolver {
     return this.authService.signIn(email, password);
   }
 
+  @Mutation('signOut')
+  async signOut(@Args('refresh_token') refreshToken: string) {
+    return this.authService.signOut(refreshToken);
+  }
+
   @Mutation('refreshToken')
   async refreshToken(@Args('refresh_token') refreshToken: string) {
     return this.authService.refreshTokens(refreshToken);

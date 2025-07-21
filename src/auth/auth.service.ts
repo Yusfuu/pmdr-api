@@ -42,16 +42,22 @@ export class AuthService {
     return { access_token, refresh_token };
   }
 
-  async refreshTokens(refreshToken: string) {
-    let payload: { id: string };
+  async signOut(refreshToken: string) {
+    const payload = await this.verifyToken<{ id: string }>(refreshToken);
 
-    try {
-      payload = await this.jwtService.verifyAsync(refreshToken, {
-        secret: process.env.JWT_SECRET,
-      });
-    } catch (error) {
+    const storedToken = await this.redisClient.get(
+      `refresh_token:${payload.id}`,
+    );
+    if (!storedToken || storedToken !== refreshToken) {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
+
+    await this.redisClient.del(`refresh_token:${payload.id}`);
+    return true;
+  }
+
+  async refreshTokens(refreshToken: string) {
+    const payload = await this.verifyToken<{ id: string }>(refreshToken);
 
     const storedToken = await this.redisClient.get(
       `refresh_token:${payload.id}`,
@@ -91,15 +97,21 @@ export class AuthService {
     });
   }
 
-  async logout(userId: string) {
-    await this.redisClient.del(`refresh_token:${userId}`);
-  }
-
   async hashPassword(password: string) {
     return bcrypt.hash(password, 10);
   }
 
   async verifyPasswordHash(hash: string, password: string) {
     return bcrypt.compare(hash, password);
+  }
+
+  private async verifyToken<T extends object = any>(token: string): Promise<T> {
+    try {
+      return await this.jwtService.verifyAsync<T>(token, {
+        secret: process.env.JWT_SECRET,
+      });
+    } catch (error) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
   }
 }
