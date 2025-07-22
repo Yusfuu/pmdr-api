@@ -8,9 +8,11 @@ import { PrismaService } from 'src/prisma/prisma.service';
 describe('Auth Flow (e2e)', () => {
   let app: INestApplication;
   let redis: Redis;
+  let accessToken: string;
+  let refreshToken: string;
 
   const testUser = {
-    email: 'Hellen.Bauch@gmail.com',
+    email: 'Maida44@yahoo.com',
     password: 'secret',
   };
 
@@ -26,44 +28,42 @@ describe('Auth Flow (e2e)', () => {
       host: process.env.REDIS_HOST || 'localhost',
       port: Number(process.env.REDIS_PORT) || 6379,
     });
-
-    // Optionally create user here if registration not tested
   });
 
   afterAll(async () => {
     await redis.quit();
-    await app.get(PrismaService).onModuleDestroy(); // optional
-
+    await app.get(PrismaService).onModuleDestroy?.();
     await app.close();
   });
 
-  let access_token: string;
-  let refresh_token: string;
-
-  it('should login and return tokens', async () => {
-    const res = await request(app.getHttpServer())
+  it('should sign in and return tokens', async () => {
+    const response = await request(app.getHttpServer())
       .post('/gql')
       .send({
         query: `
-        mutation {
-          signIn(email: "${testUser.email}", password: "${testUser.password}") {
-            access_token
-            refresh_token
+          mutation {
+            signIn(email: "${testUser.email}", password: "${testUser.password}") {
+              access_token
+              refresh_token
+            }
           }
-        }`,
+        `,
       });
 
-    expect(res.body.data.signIn.access_token).toBeDefined();
-    expect(res.body.data.signIn.refresh_token).toBeDefined();
+    const tokens = response.body.data?.signIn;
 
-    access_token = res.body.data.signIn.access_token;
-    refresh_token = res.body.data.signIn.refresh_token;
+    expect(tokens).toBeDefined();
+    expect(tokens.access_token).toBeDefined();
+    expect(tokens.refresh_token).toBeDefined();
+
+    accessToken = tokens.access_token;
+    refreshToken = tokens.refresh_token;
   });
 
-  it('should access protected "me" route with access token', async () => {
-    const res = await request(app.getHttpServer())
+  it('should access "me" query with valid access token', async () => {
+    const response = await request(app.getHttpServer())
       .post('/gql')
-      .set('Authorization', `Bearer ${access_token}`)
+      .set('Authorization', `Bearer ${accessToken}`)
       .send({
         query: `
           query {
@@ -76,39 +76,56 @@ describe('Auth Flow (e2e)', () => {
         `,
       });
 
-    expect(res.body.data.me.email).toEqual(testUser.email);
+    const me = response.body.data?.me;
+
+    expect(me).toBeDefined();
+    expect(me.email).toBe(testUser.email);
   });
 
   it('should refresh tokens using refresh token', async () => {
-    const res = await request(app.getHttpServer())
+    const response = await request(app.getHttpServer())
       .post('/gql')
       .send({
         query: `
-        mutation {
-          refreshToken(refresh_token: "${refresh_token}") {
-            access_token
-            refresh_token
+          mutation {
+            refreshToken(refresh_token: "${refreshToken}") {
+              access_token
+              refresh_token
+            }
           }
-        }`,
+        `,
       });
 
-    expect(res.body.data.refreshToken.access_token).toBeDefined();
-    expect(res.body.data.refreshToken.refresh_token).toBeDefined();
+    const tokens = response.body.data?.refreshToken;
+
+    expect(tokens).toBeDefined();
+    expect(tokens.access_token).toBeDefined();
+    expect(tokens.refresh_token).toBeDefined();
   });
 
-  it('should reject invalid access token', async () => {
-    const res = await request(app.getHttpServer())
+  it('should reject request with invalid access token', async () => {
+    const response = await request(app.getHttpServer())
       .post('/gql')
-      .set('Authorization', `Bearer invalidtoken`)
+      .set('Authorization', `Bearer invalid.token`)
       .send({
-        query: `query { me { id email name } }`,
+        query: `
+          query {
+            me {
+              id
+              email
+              name
+            }
+          }
+        `,
       });
 
-    expect(res.body.errors[0].extensions.code).toBe('UNAUTHENTICATED');
+    const error = response.body.errors?.[0];
+    expect(error).toBeDefined();
+    expect(error.extensions.code).toBe('UNAUTHENTICATED');
   });
 
-  it('should reject expired/invalid refresh token', async () => {
-    const res = await request(app.getHttpServer())
+  it('should reject invalid refresh token', async () => {
+    const response = await request(app.getHttpServer())
       .post('/gql')
       .send({
         query: `
@@ -117,9 +134,41 @@ describe('Auth Flow (e2e)', () => {
               access_token
               refresh_token
             }
-          }`,
+          }
+        `,
       });
 
-    expect(res.body.errors[0].message).toContain('Invalid or expired');
+    const error = response.body.errors?.[0];
+    expect(error).toBeDefined();
+    expect(error.message).toMatch(/Invalid or expired/i);
+  });
+
+  it('should logout and invalidate refresh token', async () => {
+    const logoutRes = await request(app.getHttpServer())
+      .post('/gql')
+      .send({
+        query: `
+        mutation {
+          signOut(refresh_token: "${refreshToken}")
+        }
+      `,
+      });
+
+    expect(logoutRes.body.data.signOut).toBe(true);
+
+    const refreshRes = await request(app.getHttpServer())
+      .post('/gql')
+      .send({
+        query: `
+        mutation {
+          refreshToken(refresh_token: "${refreshToken}") {
+            access_token
+            refresh_token
+          }
+        }
+      `,
+      });
+
+    expect(refreshRes.body.errors?.[0].message).toMatch(/Invalid or expired/i);
   });
 });
