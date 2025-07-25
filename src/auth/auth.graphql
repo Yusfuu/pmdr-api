@@ -4,9 +4,9 @@ type Tokens {
 }
 
 type Mutation {
-  signIn(email: String!, password: String!): Tokens!
-  signOut(refresh_token: String): Boolean!
-  refreshToken(refresh_token: String!): Tokens!
+  signIn(email: String!, password: String!, deviceId: String!): Tokens!
+  signOut(refresh_token: String!, deviceId: String!): Boolean!
+  refreshToken(refresh_token: String!, deviceId: String!): Tokens!
 }
 
 type Query {

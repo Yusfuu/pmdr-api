@@ -35,6 +35,7 @@
     "@prisma/client": "^6.12.0",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.56.5",
+    "dataloader": "^2.2.3",
     "graphql": "^16.11.0",
     "graphql-redis-subscriptions": "^2.7.0",
     "graphql-subscriptions": "^3.0.0",

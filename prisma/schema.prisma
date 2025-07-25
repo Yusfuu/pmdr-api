@@ -8,8 +8,50 @@ datasource db {
 }
 
 model User {
-  id       String @id @default(uuid())
-  email    String @unique
-  name     String
-  password String
+  id          String       @id @default(uuid())
+  email       String       @unique
+  name        String
+  password    String
+  avatarUrl   String?
+  bio         String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  ownedRooms  Room[]       @relation("RoomOwner")
+  memberships RoomMember[]
+}
+
+model Room {
+  id         String       @id @default(uuid())
+  name       String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  ownerId    String
+  owner      User         @relation("RoomOwner", fields: [ownerId], references: [id])
+  members    RoomMember[]
+  inviteCode String?      @unique
+}
+
+model RoomMember {
+  id       String           @id @default(uuid())
+  userId   String
+  roomId   String
+  role     RoomRole         @default(MEMBER)
+  user     User             @relation(fields: [userId], references: [id])
+  room     Room             @relation(fields: [roomId], references: [id])
+  joinedAt DateTime         @default(now())
+  status   RoomMemberStatus @default(ACTIVE)
+
+  @@unique([userId, roomId])
+}
+
+enum RoomRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum RoomMemberStatus {
+  ACTIVE
+  BANNED
+  LEFT
 }

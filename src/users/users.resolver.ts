@@ -3,6 +3,9 @@ import { UsersService } from './users.service';
 import { CreateUserInput, User } from 'src/graphql/graphql';
 import { pubSub } from 'src/common/constants/pubsub';
 import * as bcrypt from 'bcrypt';
+import { UseGuards } from '@nestjs/common';
+import { AuthGuard } from 'src/common/guards/auth.guard';
+import { CurrentUser } from 'src/common/guards/gql-auth.guard';
 
 @Resolver('User')
 export class UsersResolver {
@@ -19,11 +22,18 @@ export class UsersResolver {
 
     const user = await this.userService.create({ ...input, password });
     await pubSub.publish('userCreated', { userCreated: user });
+
     return user;
   }
 
   @Subscription()
   userCreated() {
     return pubSub.asyncIterableIterator('userCreated');
+  }
+
+  @Query('me')
+  @UseGuards(AuthGuard)
+  me(@CurrentUser() user: User) {
+    return this.userService.findById(user.id);
   }
 }

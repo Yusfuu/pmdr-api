@@ -1,10 +1,6 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
-import { UseGuards } from '@nestjs/common';
-import { AuthGuard } from 'src/common/guards/auth.guard';
-import { CurrentUser } from 'src/common/guards/gql-auth.guard';
 import { UsersService } from 'src/users/users.service';
-import { User } from 'src/graphql/graphql';
 
 @Resolver()
 export class AuthResolver {
@@ -17,23 +13,24 @@ export class AuthResolver {
   async signIn(
     @Args('email') email: string,
     @Args('password') password: string,
+    @Args('deviceId') deviceId: string,
   ) {
-    return this.authService.signIn(email, password);
+    return this.authService.signIn(email, password, deviceId);
   }
 
   @Mutation('signOut')
-  async signOut(@Args('refresh_token') refreshToken: string) {
-    return this.authService.signOut(refreshToken);
+  async signOut(
+    @Args('refresh_token') refreshToken: string,
+    @Args('deviceId') deviceId: string,
+  ) {
+    return this.authService.signOut(refreshToken, deviceId);
   }
 
   @Mutation('refreshToken')
-  async refreshToken(@Args('refresh_token') refreshToken: string) {
-    return this.authService.refreshTokens(refreshToken);
-  }
-
-  @Query('me')
-  @UseGuards(AuthGuard)
-  me(@CurrentUser() user: User) {
-    return this.userService.findById(user.id);
+  async refreshToken(
+    @Args('refresh_token') refreshToken: string,
+    @Args('deviceId') deviceId: string,
+  ) {
+    return this.authService.refreshTokens(refreshToken, deviceId);
   }
 }

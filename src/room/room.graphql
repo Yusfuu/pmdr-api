@@ -1,0 +1,43 @@
+type Room {
+  id: ID!
+  name: String!
+  owner: User!
+  members: [RoomMember!]!
+  createdAt: String!
+  updatedAt: String!
+}
+
+type RoomMember {
+  id: ID!
+  user: User!
+  role: RoomRole!
+  joinedAt: String!
+}
+
+type UserLeftPayload {
+  roomId: ID!
+  userId: ID!
+}
+
+enum RoomRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+type Mutation {
+  createRoom(name: String!): Room!
+  joinRoom(roomId: ID!): RoomMember!
+  leaveRoom(roomId: ID!): Boolean!
+}
+
+type Subscription {
+  roomCreated: Room!
+  userJoinedRoom(roomId: ID!): RoomMember!
+  userLeftRoom(roomId: ID!): UserLeftPayload!
+}
+
+type Query {
+  room(id: ID!): Room
+  rooms: [Room]!
+}

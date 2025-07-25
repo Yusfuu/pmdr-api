@@ -12,69 +12,73 @@ export class AuthService {
     @Inject('REDIS_CLIENT') private readonly redisClient: Redis,
   ) {}
 
-  async signIn(email: string, password: string) {
+  async signIn(email: string, password: string, deviceId: string) {
     const user = await this.usersService.findByEmail(email);
 
-    if (!user) {
-      throw new UnauthorizedException();
-    }
+    if (!user) throw new UnauthorizedException();
 
-    const isPasswordValid = await this.verifyPasswordHash(
-      password,
-      user.password,
-    );
+    const match = await this.verifyPasswordHash(password, user.password);
 
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
+    if (!match) throw new UnauthorizedException('Invalid credentials');
 
-    const access_token = await this.access_token({ id: user.id });
-
-    const refresh_token = await this.refresh_token({ id: user.id });
+    const access_token = await this.createAccessToken({ id: user.id });
+    const refresh_token = await this.createRefreshToken({
+      id: user.id,
+      deviceId,
+    });
 
     await this.redisClient.set(
-      `refresh_token:${user.id}`,
+      `refresh_token:${user.id}:${deviceId}`,
       refresh_token,
       'EX',
-      parseInt(process.env.JWT_REFRESH_EXPIRATION, 10),
+      +process.env.JWT_REFRESH_EXPIRATION,
     );
 
     return { access_token, refresh_token };
   }
 
-  async signOut(refreshToken: string) {
+  async signOut(refreshToken: string, deviceId: string) {
     const payload = await this.verifyToken<{ id: string }>(refreshToken);
 
     const storedToken = await this.redisClient.get(
-      `refresh_token:${payload.id}`,
+      `refresh_token:${payload.id}:${deviceId}`,
     );
     if (!storedToken || storedToken !== refreshToken) {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
 
-    await this.redisClient.del(`refresh_token:${payload.id}`);
+    await this.redisClient.del(`refresh_token:${payload.id}:${deviceId}`);
     return true;
   }
 
-  async refreshTokens(refreshToken: string) {
-    const payload = await this.verifyToken<{ id: string }>(refreshToken);
+  async refreshTokens(refreshToken: string, deviceId: string) {
+    const payload = await this.verifyToken<{ id: string; deviceId: string }>(
+      refreshToken,
+    );
 
     const storedToken = await this.redisClient.get(
-      `refresh_token:${payload.id}`,
+      `refresh_token:${payload.id}:${deviceId}`,
     );
 
     if (!storedToken || storedToken !== refreshToken) {
       throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    if (payload.deviceId !== deviceId) {
+      throw new UnauthorizedException('Token does not match device');
     }
 
     const user = await this.usersService.findById(payload.id);
     if (!user) throw new UnauthorizedException();
 
-    const access_token = await this.access_token({ id: user.id });
-    const refresh_token = await this.refresh_token({ id: user.id });
+    const access_token = await this.createAccessToken({ id: user.id });
+    const refresh_token = await this.createRefreshToken({
+      id: user.id,
+      deviceId,
+    });
 
     await this.redisClient.set(
-      `refresh_token:${user.id}`,
+      `refresh_token:${user.id}:${deviceId}`,
       refresh_token,
       'EX',
       parseInt(process.env.JWT_REFRESH_EXPIRATION, 10),
@@ -83,14 +87,14 @@ export class AuthService {
     return { access_token, refresh_token };
   }
 
-  async access_token(payload) {
+  async createAccessToken(payload) {
     return this.jwtService.signAsync(payload, {
       secret: process.env.JWT_SECRET,
       expiresIn: `${process.env.JWT_ACCESS_EXPIRATION}s`,
     });
   }
 
-  async refresh_token(payload) {
+  async createRefreshToken(payload) {
     return this.jwtService.signAsync(payload, {
       secret: process.env.JWT_SECRET,
       expiresIn: `${process.env.JWT_REFRESH_EXPIRATION}s`,
@@ -101,8 +105,8 @@ export class AuthService {
     return bcrypt.hash(password, 10);
   }
 
-  async verifyPasswordHash(hash: string, password: string) {
-    return bcrypt.compare(hash, password);
+  async verifyPasswordHash(password: string, hash: string) {
+    return bcrypt.compare(password, hash);
   }
 
   private async verifyToken<T extends object = any>(token: string): Promise<T> {
