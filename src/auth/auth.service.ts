@@ -12,6 +12,20 @@ export class AuthService {
     @Inject('REDIS_CLIENT') private readonly redisClient: Redis,
   ) {}
 
+  async signUp(email: string, password: string, name: string) {
+    const existing = await this.usersService.findByEmail(email);
+    if (existing) {
+      throw new Error('Email already in use');
+    }
+
+    const hashedPassword = await this.hashPassword(password);
+    return this.usersService.create({
+      email,
+      password: hashedPassword,
+      name,
+    });
+  }
+
   async signIn(email: string, password: string, deviceId: string) {
     const user = await this.usersService.findByEmail(email);
 

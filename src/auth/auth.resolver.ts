@@ -18,6 +18,17 @@ export class AuthResolver {
     return this.authService.signIn(email, password, deviceId);
   }
 
+  @Mutation('signUp')
+  async signUp(
+    @Args('email') email: string,
+    @Args('password') password: string,
+    @Args('deviceId') deviceId: string,
+    @Args('name') name: string,
+  ) {
+    await this.authService.signUp(email, password, name);
+    return this.authService.signIn(email, password, deviceId);
+  }
+
   @Mutation('signOut')
   async signOut(
     @Args('refresh_token') refreshToken: string,

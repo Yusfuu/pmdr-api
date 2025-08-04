@@ -4,6 +4,12 @@ type Tokens {
 }
 
 type Mutation {
+  signUp(
+    email: String!
+    password: String!
+    name: String
+    deviceId: String!
+  ): Tokens!
   signIn(email: String!, password: String!, deviceId: String!): Tokens!
   signOut(refresh_token: String!, deviceId: String!): Boolean!
   refreshToken(refresh_token: String!, deviceId: String!): Tokens!
