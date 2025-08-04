@@ -9,7 +9,6 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { RedisModule } from './redis/redis.module';
 import { JobsModule } from './jobs/jobs.module';
-import { RoomModule } from './room/room.module';
 
 @Module({
   imports: [
@@ -40,7 +39,6 @@ import { RoomModule } from './room/room.module';
     AuthModule,
     RedisModule,
     JobsModule,
-    RoomModule,
   ],
   controllers: [AppController],
   providers: [AppService],
