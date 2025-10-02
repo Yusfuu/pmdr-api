@@ -35,6 +35,17 @@ export class AuthService {
 
     if (!match) throw new UnauthorizedException('Invalid credentials');
 
+    if (user.isFirstLogin) {
+      await this.usersService.update(user.id, {
+        isFirstLogin: false,
+        lastLoginAt: new Date(),
+      });
+    } else {
+      await this.usersService.update(user.id, {
+        lastLoginAt: new Date(),
+      });
+    }
+
     const access_token = await this.createAccessToken({ id: user.id });
     const refresh_token = await this.createRefreshToken({
       id: user.id,
