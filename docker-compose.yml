@@ -46,6 +46,8 @@ services:
     environment:
       NC_ADMIN_EMAIL: admin@binga.local
       NC_ADMIN_PASSWORD: admin123
+      NC_PUBLIC_URL: 'https://testing.binga.network/noco'
+
     volumes:
       - nocodb-data:/usr/app/data
     depends_on:
