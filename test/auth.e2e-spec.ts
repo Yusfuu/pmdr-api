@@ -12,7 +12,7 @@ describe('Auth Flow (e2e)', () => {
   let refreshToken: string;
 
   const testUser = {
-    email: 'Maida44@yahoo.com',
+    email: 'test@test.com',
     password: 'secret',
   };
 

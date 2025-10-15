@@ -14,6 +14,14 @@ async function main() {
   // Optional: clear existing
   await prisma.user.deleteMany();
 
+  await prisma.user.create({
+    data: {
+      email: 'test@test.com',
+      name: faker.person.fullName(),
+      password: hashedPassword,
+    },
+  });
+
   // Seed 10 fake users
   for (let i = 0; i < counter; i++) {
     await prisma.user.create({
