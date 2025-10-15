@@ -95,7 +95,7 @@ export class AuthService {
       `refresh_token:${user.id}:${deviceId}`,
       refresh_token,
       'EX',
-      parseInt(process.env.JWT_REFRESH_EXPIRATION, 10),
+      parseInt(`${process.env.JWT_REFRESH_EXPIRATION}`, 10),
     );
 
     return { access_token, refresh_token };

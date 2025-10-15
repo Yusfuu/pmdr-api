@@ -4,8 +4,8 @@ declare global {
       DATABASE_URL: string;
       PORT: string;
       JWT_SECRET: string;
-      JWT_ACCESS_EXPIRATION: string;
-      JWT_REFRESH_EXPIRATION: string;
+      JWT_ACCESS_EXPIRATION: number;
+      JWT_REFRESH_EXPIRATION: number;
       REDIS_HOST: string;
       REDIS_PORT: string;
     }
